@@ -3,15 +3,46 @@ package handlers
 import (
 	"kanban-api/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-var tasks = []models.Task{}
-var nextID = 1
+// Ponte que cria a conexão com o banco
+var DB *gorm.DB
+
+func GetTeams(c *gin.Context) {
+	var teams []models.Team
+	DB.Find(&teams)
+	c.JSON(http.StatusOK, teams)
+}
+
+func GetUsers(c *gin.Context) {
+	var users []models.User
+	DB.Preload("Team").Find(&users)
+	c.JSON(http.StatusOK, users)
+}
+
+// --- FUNÇÕES DE TAREFAS ---
 
 func GetTasks(c *gin.Context) {
+	var tasks []models.Task
+
+	// Inicia a query já carregando os dados do Usuário e da Equipe
+	query := DB.Preload("User").Preload("Team")
+
+	if userID := c.Query("userId"); userID != "" {
+		query = query.Where("user_id = ?", userID)
+	}
+	if teamID := c.Query("teamId"); teamID != "" {
+		query = query.Where("team_id = ?", teamID)
+	}
+	if status := c.Query("status"); status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	query.Find(&tasks)
+
 	c.JSON(http.StatusOK, tasks)
 }
 
@@ -21,58 +52,66 @@ func CreateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	newTask.ID = nextID
+
 	if newTask.Status == "" {
 		newTask.Status = "TODO"
 	}
-	nextID++
-	tasks = append(tasks, newTask)
+
+	DB.Create(&newTask)
+
+	// Recarrega a tarefa com as estruturas do Usuário e Time para devolver completa
+	DB.Preload("User").Preload("Team").First(&newTask, newTask.ID)
+
 	c.JSON(http.StatusCreated, newTask)
 }
 
 func UpdateTaskStatus(c *gin.Context) {
-	idParam := c.Param("id")
-	id, _ := strconv.Atoi(idParam)
+	id := c.Param("id")
 
-	// Agora preparamos para receber a estrutura completa da tarefa
+	var task models.Task
+	if err := DB.First(&task, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Tarefa não encontrada"})
+		return
+	}
+
 	var updateData models.Task
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	for i, task := range tasks {
-		if task.ID == id {
-			// Atualiza apenas os campos que vieram preenchidos do React
-			if updateData.Status != "" {
-				tasks[i].Status = updateData.Status
-			}
-			if updateData.Title != "" {
-				tasks[i].Title = updateData.Title
-			}
-			if updateData.Description != "" {
-				tasks[i].Description = updateData.Description
-			}
-			if updateData.DueDate != "" {
-				tasks[i].DueDate = updateData.DueDate
-			}
-
-			c.JSON(http.StatusOK, tasks[i])
-			return
-		}
+	if updateData.Status != "" {
+		task.Status = updateData.Status
 	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Tarefa não encontrada"})
+	if updateData.Title != "" {
+		task.Title = updateData.Title
+	}
+	if updateData.Description != "" {
+		task.Description = updateData.Description
+	}
+	if updateData.DueDate != "" {
+		task.DueDate = updateData.DueDate
+	}
+
+	if updateData.UserID != 0 {
+		task.UserID = updateData.UserID
+	}
+	if updateData.TeamID != 0 {
+		task.TeamID = updateData.TeamID
+	}
+
+	DB.Save(&task)
+
+	// Recarrega os relacionamentos para enviar os nomes corretos de volta
+	DB.Preload("User").Preload("Team").First(&task, task.ID)
+
+	c.JSON(http.StatusOK, task)
 }
 
 func DeleteTask(c *gin.Context) {
-	idParam := c.Param("id")
-	id, _ := strconv.Atoi(idParam)
-	for i, task := range tasks {
-		if task.ID == id {
-			tasks = append(tasks[:i], tasks[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "Deletado com sucesso"})
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Tarefa não encontrada"})
+	id := c.Param("id")
+
+	DB.Delete(&models.Task{}, id)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Deletado com sucesso"})
 }

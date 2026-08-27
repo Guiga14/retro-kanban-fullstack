@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Adicione isso para forçar a fonte na aplicação inteira */
+body {
+  font-family: 'VT323', monospace;
+  letter-spacing: 1px;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

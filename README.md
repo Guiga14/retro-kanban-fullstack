@@ -1,17 +1,40 @@
-# Mini Kanban - Desafio Fullstack Veritas
+# 👾 Kanban Corporativo (Retro Edition)
 
-##  Sobre o Projeto
-Este é um projeto fullstack desenvolvido para o processo seletivo da Veritas. Trata-se de um Mini Kanban de Tarefas que permite o gerenciamento fluido de atividades nas colunas: A Fazer, Em Progresso e Concluídas, cumprindo todos os requisitos do MVP.
+Um sistema de gestão de tarefas Fullstack focado em produtividade corporativa, construído com uma arquitetura de banco de dados relacional e estilizado com uma interface Retro/Pixel Art imersiva.
 
-##  Tecnologias Utilizadas
-* **Frontend:** React, Vite, Tailwind CSS
-* **Backend:** Go, framework Gin
-* **Armazenamento:** Estrutura de dados em memória (conforme escopo do edital)
+## 🚀 Funcionalidades
 
-##  Como Executar o Projeto
+*   **Gestão de Tarefas (CRUD):** Criação, edição, exclusão e movimentação de tarefas entre colunas (A Fazer, Em Progresso, Concluídas).
+*   **Arquitetura Relacional:** Relacionamento estruturado entre Tarefas, Usuários e Equipes utilizando chaves estrangeiras (Foreign Keys).
+*   **Filtros Dinâmicos:** Busca filtrada por Equipes e Responsáveis implementada diretamente na API via Query Parameters.
+*   **UI/UX Personalizada:** Interface responsiva construída do zero com Tailwind CSS, apresentando um design "Retro 8-bits" com modais dinâmicos e validação de formulários.
+*   **Database Seeding:** População automática de times e usuários de teste ao iniciar a aplicação pela primeira vez.
 
-### Rodando o Backend da API (Go)
-1. Abra um terminal e acesse a pasta `backend`.
-2. Execute o comando:
-   ```bash
-   go run main.go
+## 🛠️ Tecnologias Utilizadas
+
+### Backend
+*   **Linguagem:** Go (Golang)
+*   **Framework Web:** Gin
+*   **ORM:** GORM
+*   **Banco de Dados:** PostgreSQL
+
+### Frontend
+*   **Biblioteca:** React (via Vite)
+*   **Estilização:** Tailwind CSS + Google Fonts (VT323)
+
+---
+
+## ⚙️ Como Executar o Projeto Localmente
+
+### Pré-requisitos
+*   [Go](https://golang.org/) instalado.
+*   [Node.js](https://nodejs.org/) instalado.
+*   [PostgreSQL](https://www.postgresql.org/) rodando localmente (Porta 5432).
+
+### 1. Configurando o Banco de Dados e Backend
+Abra o terminal, navegue até a pasta `backend` e inicie o servidor. O GORM criará as tabelas e inserirá os dados iniciais automaticamente.
+
+```bash
+cd backend
+go mod tidy
+go run main.go
