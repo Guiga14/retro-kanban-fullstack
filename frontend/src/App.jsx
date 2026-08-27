@@ -133,89 +133,97 @@ function App() {
     return `${parts[2]}/${parts[1]}/${parts[0]}`
   }
 
-  const renderColumn = (statusName, titleColumn, bgColor) => {
+const renderColumn = (statusName, titleColumn, bgColor) => {
     const filteredTasks = tasks.filter(task => task.status === statusName)
 
     return (
-      <div className={`flex flex-col w-1/3 p-4 rounded-md border-4 border-black min-h-[500px] shadow-[6px_6px_0_0_#000000] ${bgColor}`}>
-        <h2 className="text-2xl font-bold mb-4 text-black text-center">{titleColumn} ({filteredTasks.length})</h2>
+      <div className="flex flex-col w-1/3 min-h-[500px]">
         
-        {filteredTasks.map(task => (
-          <div key={task.id} className="bg-white border-4 border-black p-4 rounded-md mb-3 shadow-[4px_4px_0_0_#000000] text-black">
-            
-            {editingTaskId === task.id ? (
-              <div className="flex flex-col gap-2">
-                <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Título" />
-                <input type="text" value={editDescription} onChange={e => setEditDescription(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Descrição" />
-                
-                <select value={editTeamId} onChange={e => setEditTeamId(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none">
-                  <option value="">Selecione a Equipe</option>
-                  {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </select>
+        {/* CABEÇALHO SEPARADO COM EFEITO 3D E CANTOS PIXELADOS */}
+        <div className={`border-4 border-black py-3 px-4 mb-3 pixel-corners retro-bevel ${bgColor}`}>
+          <h2 className="text-2xl font-bold text-black text-center">{titleColumn} ({filteredTasks.length})</h2>
+        </div>
+        
+        {/* ÁREA DAS TAREFAS COM FUNDO PONTILHADO */}
+        <div className={`flex flex-col flex-1 border-4 border-black p-4 pixel-corners retro-bevel retro-dots ${bgColor}`}>
+          
+          {filteredTasks.map(task => (
+            <div key={task.id} className="bg-white border-4 border-black p-4 mb-3 shadow-[4px_4px_0_0_#000000] text-black pixel-corners">
+              
+              {editingTaskId === task.id ? (
+                <div className="flex flex-col gap-2">
+                  <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Título" />
+                  <input type="text" value={editDescription} onChange={e => setEditDescription(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Descrição" />
+                  
+                  <select value={editTeamId} onChange={e => setEditTeamId(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none">
+                    <option value="">Selecione a Equipe</option>
+                    {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  </select>
 
-                <select value={editUserId} onChange={e => setEditUserId(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none">
-                  <option value="">Selecione o Responsável</option>
-                  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                </select>
+                  <select value={editUserId} onChange={e => setEditUserId(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none">
+                    <option value="">Selecione o Responsável</option>
+                    {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </select>
 
-                <input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none" />
-                
-                <div className="flex gap-2 mt-2">
-                  <button onClick={() => saveEdit(task.id)} className="bg-green-500 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Salvar</button>
-                  <button onClick={() => setEditingTaskId(null)} className="bg-gray-400 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Cancelar</button>
+                  <input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none" />
+                  
+                  <div className="flex gap-2 mt-2">
+                    <button onClick={() => saveEdit(task.id)} className="bg-green-500 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Salvar</button>
+                    <button onClick={() => setEditingTaskId(null)} className="bg-gray-400 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Cancelar</button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-2xl leading-tight">{task.title}</h3>
-                  {task.team && (
-                    <span className="bg-purple-300 text-black border-2 border-black text-sm font-bold px-2 py-1 rounded ml-2 shadow-[2px_2px_0_0_#000]">
-                      {task.team.name}
-                    </span>
-                  )}
-                </div>
-                
-                <p className="text-gray-700 text-lg mb-3">{task.description}</p>
-                
-                <div className="flex justify-between items-center mb-4 border-t-2 border-dashed border-gray-400 pt-2">
-                   {task.user && (
-                    <div className="flex items-center gap-2 text-lg text-black font-medium">
-                      <div className="w-6 h-6 bg-blue-300 border-2 border-black text-black flex items-center justify-center font-bold shadow-[2px_2px_0_0_#000]">
-                        {task.user.name.charAt(0)}
+              ) : (
+                <>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-2xl leading-tight">{task.title}</h3>
+                    {task.team && (
+                      <span className="bg-purple-300 text-black border-2 border-black text-sm font-bold px-2 py-1 rounded ml-2 shadow-[2px_2px_0_0_#000]">
+                        {task.team.name}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="text-gray-700 text-lg mb-3">{task.description}</p>
+                  
+                  <div className="flex justify-between items-center mb-4 border-t-2 border-dashed border-gray-400 pt-2">
+                     {task.user && (
+                      <div className="flex items-center gap-2 text-lg text-black font-medium">
+                        <div className="w-6 h-6 bg-blue-300 border-2 border-black text-black flex items-center justify-center font-bold shadow-[2px_2px_0_0_#000]">
+                          {task.user.name.charAt(0)}
+                        </div>
+                        {task.user.name}
                       </div>
-                      {task.user.name}
-                    </div>
-                  )}
+                    )}
 
-                  {task.dueDate && (
-                    <p className="text-lg font-bold text-red-600 bg-red-100 px-2 border-2 border-red-600 rounded">
-                      {formatDate(task.dueDate)}
-                    </p>
-                  )}
-                </div>
-                
-                <div className="flex justify-between gap-2 text-lg mb-2">
-                   <button onClick={() => startEditing(task)} className="bg-blue-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-blue-500 hover:translate-y-[2px] hover:shadow-none transition-all">Editar</button>
-                   <button onClick={() => openDeleteModal(task.id)} className="bg-red-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-red-500 hover:translate-y-[2px] hover:shadow-none transition-all">Excluir</button>
-                </div>
+                    {task.dueDate && (
+                      <p className="text-lg font-bold text-red-600 bg-red-100 px-2 border-2 border-red-600 rounded">
+                        {formatDate(task.dueDate)}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-between gap-2 text-lg mb-2">
+                     <button onClick={() => startEditing(task)} className="bg-blue-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-blue-500 hover:translate-y-[2px] hover:shadow-none transition-all">Editar</button>
+                     <button onClick={() => openDeleteModal(task.id)} className="bg-red-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-red-500 hover:translate-y-[2px] hover:shadow-none transition-all">Excluir</button>
+                  </div>
 
-                <div className="flex justify-between gap-2 text-lg">
-                  {statusName !== 'TODO' && (
-                    <button onClick={() => updateStatus(task.id, statusName === 'DONE' ? 'DOING' : 'TODO')} className="bg-yellow-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-yellow-500 hover:translate-y-[2px] hover:shadow-none transition-all">
-                      &lt; Voltar
-                    </button>
-                  )}
-                  {statusName !== 'DONE' && (
-                    <button onClick={() => updateStatus(task.id, statusName === 'TODO' ? 'DOING' : 'DONE')} className="bg-green-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-green-500 hover:translate-y-[2px] hover:shadow-none transition-all">
-                      Avançar &gt;
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+                  <div className="flex justify-between gap-2 text-lg">
+                    {statusName !== 'TODO' && (
+                      <button onClick={() => updateStatus(task.id, statusName === 'DONE' ? 'DOING' : 'TODO')} className="bg-yellow-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-yellow-500 hover:translate-y-[2px] hover:shadow-none transition-all">
+                        &lt; Voltar
+                      </button>
+                    )}
+                    {statusName !== 'DONE' && (
+                      <button onClick={() => updateStatus(task.id, statusName === 'TODO' ? 'DOING' : 'DONE')} className="bg-green-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-green-500 hover:translate-y-[2px] hover:shadow-none transition-all">
+                        Avançar &gt;
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -231,14 +239,14 @@ function App() {
           </h1>
           <button 
             onClick={() => setIsCreateModalOpen(true)} 
-            className="bg-blue-600 text-white border-4 border-black px-6 py-2 text-xl font-bold rounded hover:bg-blue-700 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all"
+            className="bg-blue-600 text-white border-4 border-black px-6 py-2 text-xl font-bold pixel-corners hover:bg-blue-700 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all"
           >
             + NOVA TAREFA
           </button>
         </div>
 
         {/* BARRA DE FILTROS ESTILIZADA */}
-        <div className="mb-8 bg-[#2d1b54] border-4 border-black p-4 rounded shadow-[4px_4px_0_0_#000000] flex gap-4 items-center">
+        <div className="mb-8 bg-[#2d1b54] border-4 border-black p-4 pixel-corners shadow-[4px_4px_0_0_#000000] flex gap-4 items-center">
           <span className="font-bold text-white text-xl tracking-wide">FILTROS:</span>
           
           <select 
