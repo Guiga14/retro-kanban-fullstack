@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 
 function App() {
+  // 1. SEUS ESTADOS (Memória)
+  const [metrics, setMetrics] = useState(null);
+  const [showMetrics, setShowMetrics] = useState(false);
+
   const [tasks, setTasks] = useState([])
   const [users, setUsers] = useState([])
   const [teams, setTeams] = useState([])
 
   const [filterUserId, setFilterUserId] = useState('')
   const [filterTeamId, setFilterTeamId] = useState('')
+  const [filterDeadline, setFilterDeadline] = useState("TODOS");
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -26,6 +31,17 @@ function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   const API_URL = 'http://localhost:8080'
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/metrics");
+      const data = await response.json();
+      setMetrics(data);
+      setShowMetrics(true); // Abre o painel
+    } catch (error) {
+      console.error("Erro ao buscar métricas:", error);
+    }
+  };
 
   useEffect(() => {
     fetchUsers()
@@ -62,7 +78,7 @@ function App() {
     e.preventDefault()
     if (!title || !userId || !teamId) return alert('Título, Responsável e Equipe são obrigatórios!')
 
-    const newTask = { 
+    const newTask = {
       title, description, status: 'TODO', dueDate,
       userId: parseInt(userId), teamId: parseInt(teamId)
     }
@@ -78,7 +94,7 @@ function App() {
     setDueDate('')
     setUserId('')
     setTeamId('')
-    setIsCreateModalOpen(false) 
+    setIsCreateModalOpen(false)
     fetchTasks()
   }
 
@@ -104,7 +120,7 @@ function App() {
     await fetch(`${API_URL}/tasks/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         title: editTitle, description: editDescription, dueDate: editDueDate,
         userId: parseInt(editUserId), teamId: parseInt(editTeamId)
       })
@@ -133,28 +149,41 @@ function App() {
     return `${parts[2]}/${parts[1]}/${parts[0]}`
   }
 
-const renderColumn = (statusName, titleColumn, bgColor) => {
-    const filteredTasks = tasks.filter(task => task.status === statusName)
+  const renderColumn = (statusName, titleColumn, bgColor) => {
+    const filteredTasks = tasks.filter(task => {
+      const matchStatus = task.status === statusName;
+
+      const matchTeam = filterTeamId === "" || String(task.teamId) === String(filterTeamId);
+      const matchUser = filterUserId === "" || String(task.userId) === String(filterUserId);
+
+      let matchDeadline = true;
+      if (filterDeadline === "ATRASADAS") {
+        const hoje = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+        matchDeadline = task.dueDate < hoje && task.status !== "DONE";
+      }
+
+      return matchStatus && matchTeam && matchUser && matchDeadline;
+    });
 
     return (
       <div className="flex flex-col w-1/3 min-h-[500px]">
-        
+
         {/* CABEÇALHO SEPARADO COM EFEITO 3D E CANTOS PIXELADOS */}
         <div className={`border-4 border-black py-3 px-4 mb-3 pixel-corners retro-bevel ${bgColor}`}>
           <h2 className="text-2xl font-bold text-black text-center">{titleColumn} ({filteredTasks.length})</h2>
         </div>
-        
+
         {/* ÁREA DAS TAREFAS COM FUNDO PONTILHADO */}
         <div className={`flex flex-col flex-1 border-4 border-black p-4 pixel-corners retro-bevel retro-dots ${bgColor}`}>
-          
+
           {filteredTasks.map(task => (
             <div key={task.id} className="bg-white border-4 border-black p-4 mb-3 shadow-[4px_4px_0_0_#000000] text-black pixel-corners">
-              
+
               {editingTaskId === task.id ? (
                 <div className="flex flex-col gap-2">
                   <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Título" />
                   <input type="text" value={editDescription} onChange={e => setEditDescription(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none focus:border-yellow-500" placeholder="Descrição" />
-                  
+
                   <select value={editTeamId} onChange={e => setEditTeamId(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none">
                     <option value="">Selecione a Equipe</option>
                     {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -165,8 +194,8 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
                     {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                   </select>
 
-                  <input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none" />
-                  
+                  <input type="date" lang="pt-BR" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="border-2 border-black p-1 text-lg rounded bg-gray-100 outline-none" />
+
                   <div className="flex gap-2 mt-2">
                     <button onClick={() => saveEdit(task.id)} className="bg-green-500 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Salvar</button>
                     <button onClick={() => setEditingTaskId(null)} className="bg-gray-400 text-black border-2 border-black px-2 py-1 rounded text-lg w-full shadow-[2px_2px_0_0_#000] hover:translate-y-[2px] hover:shadow-none active:translate-y-[2px] active:shadow-none">Cancelar</button>
@@ -182,11 +211,11 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
                       </span>
                     )}
                   </div>
-                  
+
                   <p className="text-gray-700 text-lg mb-3">{task.description}</p>
-                  
+
                   <div className="flex justify-between items-center mb-4 border-t-2 border-dashed border-gray-400 pt-2">
-                     {task.user && (
+                    {task.user && (
                       <div className="flex items-center gap-2 text-lg text-black font-medium">
                         <div className="w-6 h-6 bg-blue-300 border-2 border-black text-black flex items-center justify-center font-bold shadow-[2px_2px_0_0_#000]">
                           {task.user.name.charAt(0)}
@@ -201,10 +230,10 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
                       </p>
                     )}
                   </div>
-                  
+
                   <div className="flex justify-between gap-2 text-lg mb-2">
-                     <button onClick={() => startEditing(task)} className="bg-blue-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-blue-500 hover:translate-y-[2px] hover:shadow-none transition-all">Editar</button>
-                     <button onClick={() => openDeleteModal(task.id)} className="bg-red-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-red-500 hover:translate-y-[2px] hover:shadow-none transition-all">Excluir</button>
+                    <button onClick={() => startEditing(task)} className="bg-blue-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-blue-500 hover:translate-y-[2px] hover:shadow-none transition-all">Editar</button>
+                    <button onClick={() => openDeleteModal(task.id)} className="bg-red-400 text-black font-bold border-2 border-black px-2 py-1 rounded w-full shadow-[2px_2px_0_0_#000] hover:bg-red-500 hover:translate-y-[2px] hover:shadow-none transition-all">Excluir</button>
                   </div>
 
                   <div className="flex justify-between gap-2 text-lg">
@@ -231,40 +260,58 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
   return (
     <div className="min-h-screen bg-[#070b24] p-4 md:p-8 flex items-center justify-center">
       <div className="w-full max-w-6xl bg-[#171c4c] border-4 border-black p-6 rounded-lg shadow-[8px_8px_0_0_#000000]">
-        
+
         {/* CABEÇALHO RETRO */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold text-[#ffe100] tracking-widest drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
             KANBAN CORPORATIVO
           </h1>
-          <button 
-            onClick={() => setIsCreateModalOpen(true)} 
-            className="bg-blue-600 text-white border-4 border-black px-6 py-2 text-xl font-bold pixel-corners hover:bg-blue-700 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all"
-          >
-            + NOVA TAREFA
-          </button>
+
+          {/* NOSSO NOVO GRUPO DE BOTÕES */}
+          <div className="flex gap-4">
+            <button
+              onClick={fetchMetrics}
+              className="bg-yellow-500 text-black border-4 border-black px-6 py-2 text-xl font-bold pixel-corners hover:bg-yellow-400 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all"
+            >
+              📊 ESTATÍSTICAS
+            </button>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-blue-600 text-white border-4 border-black px-6 py-2 text-xl font-bold pixel-corners hover:bg-blue-700 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all"
+            >
+              + NOVA TAREFA
+            </button>
+          </div>
         </div>
 
         {/* BARRA DE FILTROS ESTILIZADA */}
         <div className="mb-8 bg-[#2d1b54] border-4 border-black p-4 pixel-corners shadow-[4px_4px_0_0_#000000] flex gap-4 items-center">
           <span className="font-bold text-white text-xl tracking-wide">FILTROS:</span>
-          
-          <select 
-            value={filterTeamId} 
-            onChange={e => setFilterTeamId(e.target.value)} 
+
+          <select
+            value={filterTeamId}
+            onChange={e => setFilterTeamId(e.target.value)}
             className="bg-[#4a3480] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000000] cursor-pointer"
           >
             <option value="">TODAS AS EQUIPES</option>
             {teams.map(t => <option key={t.id} value={t.id}>{t.name.toUpperCase()}</option>)}
           </select>
 
-          <select 
-            value={filterUserId} 
-            onChange={e => setFilterUserId(e.target.value)} 
+          <select
+            value={filterUserId}
+            onChange={e => setFilterUserId(e.target.value)}
             className="bg-[#4a3480] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000000] cursor-pointer"
           >
             <option value="">TODOS OS RESPONSÁVEIS</option>
             {users.map(u => <option key={u.id} value={u.id}>{u.name.toUpperCase()}</option>)}
+          </select>
+          <select
+            value={filterDeadline}
+            onChange={e => setFilterDeadline(e.target.value)}
+            className="bg-[#4a3480] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000000]"
+          >
+            <option value="TODOS">TODOS OS PRAZOS</option>
+            <option value="ATRASADAS">⚠️ TAREFAS ATRASADAS</option>
           </select>
         </div>
 
@@ -280,9 +327,9 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
           <div className="bg-[#0f1b5e] border-4 border-black p-6 shadow-[8px_8px_0_0_#000000] max-w-md w-full relative rounded-md">
-            
+
             <button onClick={() => setIsCreateModalOpen(false)} className="absolute top-2 right-2 bg-blue-600 text-white font-bold border-4 border-black px-2 shadow-[2px_2px_0_0_#000] hover:bg-blue-700 hover:translate-y-[2px] hover:shadow-none">X</button>
-            
+
             <h3 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">CRIAR NOVA TAREFA</h3>
 
             <form onSubmit={createTask} className="flex flex-col gap-4">
@@ -290,7 +337,7 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
                 <label className="block text-xl font-bold text-white mb-1">TÍTULO <span className="text-yellow-400">*</span></label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000000] focus:border-yellow-400" required />
               </div>
-              
+
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-xl font-bold text-white mb-1">EQUIPE <span className="text-yellow-400">*</span></label>
@@ -314,7 +361,7 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
               </div>
               <div>
                 <label className="block text-xl font-bold text-white mb-1">PRAZO</label>
-                <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000000] focus:border-yellow-400" style={{colorScheme: "dark"}} />
+                <input type="date" lang="pt-BR" value={dueDate} onChange={e => setDueDate(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-black rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000000] focus:border-yellow-400" style={{ colorScheme: "dark" }} />
               </div>
 
               <div className="flex justify-center gap-6 mt-4">
@@ -336,7 +383,7 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
           <div className="bg-[#4f0d0d] border-4 border-black p-6 shadow-[8px_8px_0_0_#000000] max-w-sm w-full rounded-md text-center">
             <h3 className="text-3xl font-bold text-[#ff5555] mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">ATENÇÃO!</h3>
             <p className="text-white text-xl mb-6">Tem certeza que deseja apagar essa tarefa para sempre?</p>
-            
+
             <div className="flex justify-center gap-4">
               <button onClick={() => setIsDeleteModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white text-xl font-bold border-4 border-black rounded shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none">
                 VOLTAR
@@ -344,6 +391,55 @@ const renderColumn = (statusName, titleColumn, bgColor) => {
               <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white text-xl font-bold border-4 border-black rounded shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none">
                 SIM, APAGAR
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL DE ESTATÍSTICAS (HIGH SCORE) */}
+      {showMetrics && metrics && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#2d1b54] border-4 border-black p-8 shadow-[8px_8px_0_0_#000] text-white max-w-md w-full relative rounded-md">
+
+            <button
+              onClick={() => setShowMetrics(false)}
+              className="absolute top-2 right-2 bg-red-600 border-4 border-black text-white px-3 py-1 text-xl font-bold hover:bg-red-500 hover:translate-y-[2px] shadow-[4px_4px_0_0_#000] hover:shadow-none transition-all"
+            >
+              X
+            </button>
+
+            <h2 className="text-3xl font-bold text-yellow-400 text-center mb-6 drop-shadow-[2px_2px_0_#000]">
+              📈 HIGH SCORES
+            </h2>
+
+            <div className="flex flex-col gap-4 text-lg font-bold">
+              <div className="flex justify-between bg-black bg-opacity-50 p-3 border-2 border-black shadow-[inset_2px_2px_0_0_#000]">
+                <span>TOTAL DE TAREFAS:</span>
+                <span className="text-blue-400">{metrics.total}</span>
+              </div>
+              <div className="flex justify-between bg-black bg-opacity-50 p-3 border-2 border-black shadow-[inset_2px_2px_0_0_#000]">
+                <span>A FAZER (TODO):</span>
+                <span className="text-gray-400">{metrics.todo}</span>
+              </div>
+              <div className="flex justify-between bg-black bg-opacity-50 p-3 border-2 border-black shadow-[inset_2px_2px_0_0_#000]">
+                <span>EM PROGRESSO:</span>
+                <span className="text-yellow-400">{metrics.doing}</span>
+              </div>
+              <div className="flex justify-between bg-black bg-opacity-50 p-3 border-2 border-black shadow-[inset_2px_2px_0_0_#000]">
+                <span>CONCLUÍDAS:</span>
+                <span className="text-green-400">{metrics.done}</span>
+              </div>
+
+              <div className={`flex justify-between p-3 border-2 shadow-[inset_2px_2px_0_0_#000] mt-2 transition-all duration-300 ${metrics.delayed > 0
+                ? "bg-red-900 bg-opacity-80 border-red-500 border-dashed animate-pulse"
+                : "bg-black bg-opacity-50 border-black"
+                }`}>
+                <span className={metrics.delayed > 0 ? "text-red-300 font-bold" : "text-gray-400 font-bold"}>
+                  {metrics.delayed > 0 ? "⚠️ ATRASADAS:" : "⚠️ ATRASADAS:"}
+                </span>
+                <span className={`font-bold ${metrics.delayed > 0 ? "text-red-400" : "text-green-500"}`}>
+                  {metrics.delayed}
+                </span>
+              </div>
             </div>
           </div>
         </div>
