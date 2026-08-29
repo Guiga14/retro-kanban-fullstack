@@ -225,7 +225,10 @@ function App() {
                     )}
 
                     {task.dueDate && (
-                      <p className="text-lg font-bold text-red-600 bg-red-100 px-2 border-2 border-red-600 rounded">
+                      <p className={`text-lg font-bold px-2 border-2 rounded shadow-[2px_2px_0_0_#000] ${task.dueDate < new Date().toISOString().split("T")[0] && task.status !== 'DONE'
+                          ? 'text-red-700 bg-red-200 border-red-600'
+                          : 'text-green-800 bg-green-200 border-green-600'
+                        }`}>
                         {formatDate(task.dueDate)}
                       </p>
                     )}
