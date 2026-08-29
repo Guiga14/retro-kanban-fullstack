@@ -47,8 +47,8 @@ func seedDatabase(db *gorm.DB) {
 		// Cria os Usuários vinculados aos times
 		users := []models.User{
 			{Name: "Guilherme", TeamID: teams[0].ID},
-			{Name: "João", TeamID: teams[1].ID},
-			{Name: "Ana", TeamID: teams[2].ID},
+			{Name: "Josefa", TeamID: teams[1].ID},
+			{Name: "Arlinda", TeamID: teams[2].ID},
 		}
 		db.Create(&users)
 		log.Println("Usuários iniciais criados com sucesso!")
@@ -70,6 +70,9 @@ func main() {
 
 	r.GET("/teams", handlers.GetTeams)
 	r.GET("/users", handlers.GetUsers)
+
+	// NOVA ROTA DE MÉTRICAS (Pode colar na linha 73)
+	r.GET("/metrics", handlers.GetMetrics)
 
 	r.Run(":8080")
 }
