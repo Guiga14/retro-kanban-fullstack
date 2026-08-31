@@ -363,85 +363,32 @@ function App() {
           {renderColumn('DONE', 'CONCLUÍDAS', 'bg-emerald-200')}
         </div>
       </div>
-      {/* PAINEL LATERAL DE EDIÇÃO */}
+      {/* MODAL CENTRALIZADO DE EDIÇÃO */}
       {editingTaskId && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-end z-50">
-          <div className="bg-slate-700 border-l-4 border-slate-800 p-8 w-full max-w-md h-full overflow-y-auto shadow-[-8px_0_0_0_#1e293b] flex flex-col animate-slide-in">
-
-            <div className="flex justify-between items-center mb-6 border-b-4 border-slate-800 pb-4">
-              <h3 className="text-3xl font-bold text-white drop-shadow-[2px_2px_0_#000]">EDITAR TAREFA</h3>
-              <button onClick={() => setEditingTaskId(null)} className="bg-red-500 text-white font-bold border-4 border-slate-800 px-4 py-1 shadow-[4px_4px_0_0_#1e293b] hover:translate-y-[2px] hover:shadow-none pixel-corners transition-all">X</button>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); saveEdit(editingTaskId); }} className="flex flex-col gap-5 flex-1">
-              <div>
-                <label className="block text-xl font-bold text-white mb-2">TÍTULO</label>
-                <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full bg-slate-800 text-white border-4 border-slate-900 p-3 text-lg outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400 pixel-corners" required />
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-xl font-bold text-white mb-2">EQUIPE</label>
-                  <select value={editTeamId} onChange={e => setEditTeamId(e.target.value)} className="w-full bg-slate-800 text-white border-4 border-slate-900 p-3 text-lg outline-none shadow-[inset_4px_4px_0_0_#000] pixel-corners" required>
-                    <option value="">Selecione...</option>
-                    {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-xl font-bold text-white mb-2">USER</label>
-                  <select value={editUserId} onChange={e => setEditUserId(e.target.value)} className="w-full bg-slate-800 text-white border-4 border-slate-900 p-3 text-lg outline-none shadow-[inset_4px_4px_0_0_#000] pixel-corners" required>
-                    <option value="">Selecione...</option>
-                    {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xl font-bold text-white mb-2">DESCRIÇÃO</label>
-                <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} className="w-full bg-slate-800 text-white border-4 border-slate-900 p-3 text-lg outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400 pixel-corners" rows="4"></textarea>
-              </div>
-
-              <div>
-                <label className="block text-xl font-bold text-white mb-2">PRAZO</label>
-                <input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="w-full bg-slate-800 text-white border-4 border-slate-900 p-3 text-lg outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400 pixel-corners" style={{ colorScheme: "dark" }} />
-              </div>
-
-              {/* Botões do Rodapé */}
-              <div className="mt-auto pt-6 flex gap-4">
-                <button type="button" onClick={() => setEditingTaskId(null)} className="flex-1 bg-gray-500 text-white text-xl font-bold border-4 border-slate-800 py-3 shadow-[4px_4px_0_0_#1e293b] hover:translate-y-[4px] hover:shadow-none transition-all pixel-corners">CANCELAR</button>
-                <button type="submit" className="flex-1 bg-green-500 text-slate-900 text-xl font-bold border-4 border-slate-800 py-3 shadow-[4px_4px_0_0_#1e293b] hover:translate-y-[4px] hover:shadow-none transition-all pixel-corners">SALVAR</button>
-              </div>
-            </form>
-
-          </div>
-        </div>
-      )}
-      {/* MODAL DE CRIAÇÃO PIXEL ART */}
-      {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0f1b5e] border-4 border-slate-800 p-6 shadow-[8px_8px_0_0_#1e293b] max-w-md w-full relative rounded-md">
+          <div className="bg-slate-700 border-4 border-slate-800 p-6 shadow-[8px_8px_0_0_#1e293b] max-w-md w-full relative rounded-md pixel-corners">
 
-            <button onClick={() => setIsCreateModalOpen(false)} className="absolute top-2 right-2 bg-blue-600 text-white font-bold border-4 border-slate-800 px-2 shadow-[2px_2px_0_0_#000] hover:bg-blue-700 hover:translate-y-[2px] hover:shadow-none">X</button>
+            <button onClick={() => setEditingTaskId(null)} className="absolute top-2 right-2 bg-red-500 text-white font-bold border-4 border-slate-800 px-2 shadow-[2px_2px_0_0_#000] hover:bg-red-600 hover:translate-y-[2px] hover:shadow-none transition-all">X</button>
 
-            <h3 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">CRIAR NOVA TAREFA</h3>
+            <h3 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">EDITAR TAREFA</h3>
 
-            <form onSubmit={createTask} className="flex flex-col gap-4">
+            <form onSubmit={(e) => { e.preventDefault(); saveEdit(editingTaskId); }} className="flex flex-col gap-4">
               <div>
-                <label className="block text-xl font-bold text-white mb-1">TÍTULO <span className="text-yellow-400">*</span></label>
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#1e293b] focus:border-yellow-400" required />
+                <label className="block text-xl font-bold text-white mb-1">TÍTULO</label>
+                <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" required />
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-xl font-bold text-white mb-1">EQUIPE <span className="text-yellow-400">*</span></label>
-                  <select value={teamId} onChange={e => setTeamId(e.target.value)} className="block w-full bg-[#4a3480] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#1e293b]" required>
+                  <label className="block text-xl font-bold text-white mb-1">EQUIPE</label>
+                  <select value={editTeamId} onChange={e => setEditTeamId(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000]" required>
                     <option value="">SELECIONE...</option>
                     {teams.map(t => <option key={t.id} value={t.id}>{t.name.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xl font-bold text-white mb-1">RESPONSÁVEL <span className="text-yellow-400">*</span></label>
-                  <select value={userId} onChange={e => setUserId(e.target.value)} className="block w-full bg-[#4a3480] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#1e293b]" required>
+                  <label className="block text-xl font-bold text-white mb-1">RESPONSÁVEL</label>
+                  <select value={editUserId} onChange={e => setEditUserId(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000]" required>
                     <option value="">SELECIONE...</option>
                     {users.map(u => <option key={u.id} value={u.id}>{u.name.toUpperCase()}</option>)}
                   </select>
@@ -450,15 +397,71 @@ function App() {
 
               <div>
                 <label className="block text-xl font-bold text-white mb-1">DESCRIÇÃO</label>
-                <textarea value={description} onChange={e => setDescription(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#1e293b] focus:border-yellow-400" rows="3"></textarea>
+                <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" rows="3"></textarea>
               </div>
+
               <div>
                 <label className="block text-xl font-bold text-white mb-1">PRAZO</label>
-                <input type="date" lang="pt-BR" value={dueDate} onChange={e => setDueDate(e.target.value)} className="block w-full bg-[#090b2e] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#1e293b] focus:border-yellow-400" style={{ colorScheme: "dark" }} />
+                <input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" style={{ colorScheme: "dark" }} />
               </div>
 
               <div className="flex justify-center gap-6 mt-4">
-                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-6 py-2 bg-gray-500 text-white text-xl border-4 border-slate-800 rounded font-bold hover:bg-gray-600 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all">
+                <button type="button" onClick={() => setEditingTaskId(null)} className="px-6 py-2 bg-slate-500 text-white text-xl border-4 border-slate-800 rounded font-bold hover:bg-slate-600 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all">
+                  CANCELAR
+                </button>
+                <button type="submit" className="px-6 py-2 bg-green-500 text-black text-xl border-4 border-slate-800 rounded font-bold hover:bg-green-600 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all">
+                  SALVAR
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CRIAÇÃO PIXEL ART */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-700 border-4 border-slate-800 p-6 shadow-[8px_8px_0_0_#1e293b] max-w-md w-full relative rounded-md pixel-corners">
+
+            <button onClick={() => setIsCreateModalOpen(false)} className="absolute top-2 right-2 bg-blue-600 text-white font-bold border-4 border-slate-800 px-2 shadow-[2px_2px_0_0_#000] hover:bg-blue-700 hover:translate-y-[2px] hover:shadow-none">X</button>
+
+            <h3 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">CRIAR NOVA TAREFA</h3>
+
+            <form onSubmit={createTask} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xl font-bold text-white mb-1">TÍTULO <span className="text-yellow-400">*</span></label>
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" required />
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-xl font-bold text-white mb-1">EQUIPE <span className="text-yellow-400">*</span></label>
+                  <select value={teamId} onChange={e => setTeamId(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000]" required>
+                    <option value="">SELECIONE...</option>
+                    {teams.map(t => <option key={t.id} value={t.id}>{t.name.toUpperCase()}</option>)}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xl font-bold text-white mb-1">RESPONSÁVEL <span className="text-yellow-400">*</span></label>
+                  <select value={userId} onChange={e => setUserId(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#000]" required>
+                    <option value="">SELECIONE...</option>
+                    {users.map(u => <option key={u.id} value={u.id}>{u.name.toUpperCase()}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xl font-bold text-white mb-1">DESCRIÇÃO</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" rows="3"></textarea>
+              </div>
+              <div>
+                <label className="block text-xl font-bold text-white mb-1">PRAZO</label>
+                <input type="date" lang="pt-BR" value={dueDate} onChange={e => setDueDate(e.target.value)} className="block w-full bg-slate-900 text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_4px_4px_0_0_#000] focus:border-yellow-400" style={{ colorScheme: "dark" }} />
+              </div>
+
+              <div className="flex justify-center gap-6 mt-4">
+                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-6 py-2 bg-slate-500 text-white text-xl border-4 border-slate-800 rounded font-bold hover:bg-slate-600 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all">
                   CANCELAR
                 </button>
                 <button type="submit" className="px-6 py-2 bg-blue-600 text-white text-xl border-4 border-slate-800 rounded font-bold hover:bg-blue-700 shadow-[4px_4px_0_0_#000] hover:translate-y-[4px] hover:shadow-none transition-all">
@@ -488,6 +491,7 @@ function App() {
           </div>
         </div>
       )}
+
       {/* MODAL DE ESTATÍSTICAS (HIGH SCORE) */}
       {showMetrics && metrics && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
