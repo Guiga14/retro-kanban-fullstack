@@ -71,7 +71,7 @@ func main() {
 	r.GET("/teams", handlers.GetTeams)
 	r.GET("/users", handlers.GetUsers)
 
-	// NOVA ROTA DE MÉTRICAS (Pode colar na linha 73)
+	// NOVA ROTA DE MÉTRICAS
 	r.GET("/metrics", handlers.GetMetrics)
 
 	r.Run(":8080")
