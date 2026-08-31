@@ -173,11 +173,26 @@ function App() {
           <h2 className="text-2xl font-bold text-black text-center">{titleColumn} ({filteredTasks.length})</h2>
         </div>
 
-        {/* ÁREA DAS TAREFAS COM FUNDO PONTILHADO */}
-        <div className={`flex flex-col flex-1 border-4 border-slate-800 p-4 pixel-corners retro-bevel retro-dots ${bgColor}`}>
+        {/* ÁREA DAS TAREFAS COM FUNDO PONTILHADO E DROP ZONE */}
+        <div
+          className={`flex flex-col flex-1 border-4 border-slate-800 p-4 pixel-corners retro-bevel retro-dots ${bgColor}`}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const draggedTaskId = e.dataTransfer.getData('taskId');
+            if (draggedTaskId) {
+              updateStatus(Number(draggedTaskId), statusName);
+            }
+          }}
+        >
 
           {filteredTasks.map(task => (
-            <div key={task.id} className="bg-white border-4 border-slate-800 p-4 mb-3 shadow-[4px_4px_0_0_#1e293b] text-black pixel-corners">
+            <div
+              key={task.id}
+              draggable
+              onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
+              className="bg-white border-4 border-slate-800 p-4 mb-3 shadow-[4px_4px_0_0_#1e293b] text-black pixel-corners cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform"
+            >
 
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-2xl leading-tight">{task.title}</h3>
@@ -270,8 +285,8 @@ function App() {
             <button
               onClick={() => setFilterTeamId("")}
               className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterTeamId === ""
-                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
                 }`}
             >
               TODAS
@@ -281,8 +296,8 @@ function App() {
                 key={t.id}
                 onClick={() => setFilterTeamId(t.id)}
                 className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterTeamId === t.id
-                    ? "bg-purple-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                    : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                  ? "bg-purple-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
                   }`}
               >
                 {t.name.toUpperCase()}
@@ -296,8 +311,8 @@ function App() {
             <button
               onClick={() => setFilterUserId("")}
               className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterUserId === ""
-                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
                 }`}
             >
               TODOS
@@ -307,8 +322,8 @@ function App() {
                 key={u.id}
                 onClick={() => setFilterUserId(u.id)}
                 className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterUserId === u.id
-                    ? "bg-blue-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                    : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                  ? "bg-blue-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
                   }`}
               >
                 {u.name.toUpperCase()}
@@ -322,8 +337,8 @@ function App() {
             <button
               onClick={() => setFilterDeadline("TODOS")}
               className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterDeadline === "TODOS"
-                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
                 }`}
             >
               TODOS OS PRAZOS
@@ -331,8 +346,8 @@ function App() {
             <button
               onClick={() => setFilterDeadline("ATRASADAS")}
               className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all flex items-center gap-2 ${filterDeadline === "ATRASADAS"
-                  ? "bg-red-500 text-white shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
-                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-red-400 hover:text-black hover:-translate-y-[1px]"
+                ? "bg-red-500 text-white shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-red-400 hover:text-black hover:-translate-y-[1px]"
                 }`}
             >
               ⚠️ TAREFAS ATRASADAS
