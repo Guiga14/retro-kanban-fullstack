@@ -202,8 +202,8 @@ function App() {
 
                 {task.dueDate && (
                   <p className={`text-lg font-bold px-2 border-2 rounded shadow-[2px_2px_0_0_#1e293b] ${task.dueDate < new Date().toISOString().split("T")[0] && task.status !== 'DONE'
-                      ? 'text-red-700 bg-red-200 border-red-600'
-                      : 'text-green-800 bg-green-200 border-green-600'
+                    ? 'text-red-700 bg-red-200 border-red-600'
+                    : 'text-green-800 bg-green-200 border-green-600'
                     }`}>
                     {formatDate(task.dueDate)}
                   </p>
@@ -261,35 +261,84 @@ function App() {
           </div>
         </div>
 
-        {/* BARRA DE FILTROS ESTILIZADA */}
-        <div className="mb-8 bg-[#2d1b54] border-4 border-slate-800 p-4 pixel-corners shadow-[4px_4px_0_0_#1e293b] flex gap-4 items-center">
-          <span className="font-bold text-white text-xl tracking-wide">FILTROS:</span>
+        {/* BARRA DE FILTROS RÁPIDOS (PÍLULAS) */}
+        <div className="mb-8 bg-slate-700 border-4 border-slate-800 p-4 pixel-corners shadow-[4px_4px_0_0_#1e293b] flex flex-col gap-4">
 
-          <select
-            value={filterTeamId}
-            onChange={e => setFilterTeamId(e.target.value)}
-            className="bg-[#4a3480] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#1e293b] cursor-pointer"
-          >
-            <option value="">TODAS AS EQUIPES</option>
-            {teams.map(t => <option key={t.id} value={t.id}>{t.name.toUpperCase()}</option>)}
-          </select>
+          {/* LINHA 1: FILTRO DE EQUIPES */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="font-bold text-yellow-400 text-xl tracking-wide min-w-[160px]">EQUIPES:</span>
+            <button
+              onClick={() => setFilterTeamId("")}
+              className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterTeamId === ""
+                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                }`}
+            >
+              TODAS
+            </button>
+            {teams.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setFilterTeamId(t.id)}
+                className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterTeamId === t.id
+                    ? "bg-purple-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                    : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                  }`}
+              >
+                {t.name.toUpperCase()}
+              </button>
+            ))}
+          </div>
 
-          <select
-            value={filterUserId}
-            onChange={e => setFilterUserId(e.target.value)}
-            className="bg-[#4a3480] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#1e293b] cursor-pointer"
-          >
-            <option value="">TODOS OS RESPONSÁVEIS</option>
-            {users.map(u => <option key={u.id} value={u.id}>{u.name.toUpperCase()}</option>)}
-          </select>
-          <select
-            value={filterDeadline}
-            onChange={e => setFilterDeadline(e.target.value)}
-            className="bg-[#4a3480] text-white border-4 border-slate-800 rounded p-2 text-xl outline-none shadow-[inset_2px_2px_0_0_#1e293b]"
-          >
-            <option value="TODOS">TODOS OS PRAZOS</option>
-            <option value="ATRASADAS">⚠️ TAREFAS ATRASADAS</option>
-          </select>
+          {/* LINHA 2: FILTRO DE RESPONSÁVEIS */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="font-bold text-yellow-400 text-xl tracking-wide min-w-[160px]">RESPONSÁVEIS:</span>
+            <button
+              onClick={() => setFilterUserId("")}
+              className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterUserId === ""
+                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                }`}
+            >
+              TODOS
+            </button>
+            {users.map(u => (
+              <button
+                key={u.id}
+                onClick={() => setFilterUserId(u.id)}
+                className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterUserId === u.id
+                    ? "bg-blue-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                    : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                  }`}
+              >
+                {u.name.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          {/* LINHA 3: FILTRO DE PRAZOS */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="font-bold text-yellow-400 text-xl tracking-wide min-w-[160px]">PRAZOS:</span>
+            <button
+              onClick={() => setFilterDeadline("TODOS")}
+              className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all ${filterDeadline === "TODOS"
+                  ? "bg-yellow-400 text-black shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-slate-600 hover:-translate-y-[1px]"
+                }`}
+            >
+              TODOS OS PRAZOS
+            </button>
+            <button
+              onClick={() => setFilterDeadline("ATRASADAS")}
+              className={`px-4 py-1 font-bold text-lg border-2 border-slate-900 pixel-corners transition-all flex items-center gap-2 ${filterDeadline === "ATRASADAS"
+                  ? "bg-red-500 text-white shadow-[inset_2px_2px_0_0_#000] translate-y-[2px]"
+                  : "bg-slate-800 text-white shadow-[2px_2px_0_0_#1e293b] hover:bg-red-400 hover:text-black hover:-translate-y-[1px]"
+                }`}
+            >
+              ⚠️ TAREFAS ATRASADAS
+            </button>
+          </div>
+
         </div>
 
         {/* COLUNAS COM CORES BASEADAS NA IMAGEM */}
